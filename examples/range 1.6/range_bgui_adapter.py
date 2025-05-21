@@ -9,15 +9,15 @@ if bgui_path not in sys.path:
 import Range as rg
 import bgl
 import bgui
+from bgui import System
 from bgui.text.blf import BlfTextLibrary
 
 class RangeBGUI:
-    def __init__(self, range_scene):
+    def __init__(self, range_scene, theme_path=None):
         self.scene = range_scene
-
         self.textlib = BlfTextLibrary()
 
-        self.system = bgui.System(self.textlib)
+        self.system = System(self.textlib, theme_path)
 
         self.frame = bgui.Frame(self.system, "main_frame", border=1)
         self.frame.colors = [(0, 0, 0, 0) for _ in range(4)]
@@ -25,8 +25,11 @@ class RangeBGUI:
         self.elements = {}
         self.scene.post_draw.append(self._render_ui)
 
+    def load_theme(self, theme_path):
+        self.system.load_theme(theme_path)
+
     def _setup_callbacks(self):
-        self.scene.add_post_draw_callback(self._render_ui)
+        self.scene.post_draw.append(self._render_ui)
         self.scene.add_input_callback(self._handle_input)
 
     def _render_ui(self):
@@ -63,6 +66,7 @@ class RangeBGUI:
     def add_element(self, element_class, name, **kwargs):
         parent = kwargs.pop('parent', self.frame)
         widget = element_class(parent, name, **kwargs)
+
         self.elements[name] = widget
         return widget
 
@@ -75,7 +79,11 @@ class RangeBGUI:
             element = self.elements[name]
             element.parent.remove_widget(element)
             del self.elements[name]
-
+    
+    @property
+    def theme(self):
+        return self.system.theme
+    
     def cleanup(self):
         self.scene.remove_post_draw_callback(self._render_ui)
         self.scene.remove_input_callback(self._handle_input)
