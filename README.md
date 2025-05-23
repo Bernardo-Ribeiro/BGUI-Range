@@ -17,18 +17,6 @@ For example: recognizing mouse clicks on the button.
 
 ---
 
-
-## Changelog
-
-### New Features
-
-* Added the class that adapts BGUI to work with Range (`RangeBGUI`).
-* Modified the text directory to better support the `TextLibrary` function call.
-  *Note:* This code was previously in the `__init__` method but did not work properly there. Since Range does not have `logic.textLib`, the `BlfTextLibrary` and `TextLibrary` classes are used instead.
-* Removed the use of PyQt4.
-
----
-
 **Implementation with Range Engine**
 
 **Author:** Bernardo Ribeiro
