@@ -1,20 +1,20 @@
-from Range import logic, types
-import bgui 
+from Range import *
+import bgui
+from bgui.bge_utils import System as BGESystem
+from collections import OrderedDict
 
-# IMPORTANT: The import is now directly from your specific BGE System.
-# Assuming 'bge_utils.py' is inside the 'bgui' package, the import would be:
-from bgui.bge_utils import System as BGESystem  # Use BGESystem to avoid conflict with bgui.System
+
 
 class MainMenu(types.KX_PythonComponent):
-    def start(self, args):
+    args = OrderedDict({
+    })
+    def start(self,args):
         self.scene = logic.getCurrentScene()
-        theme_path = logic.expandPath("//bgui/themes/default")
+        theme_name = "default"
+        
+        self.gui_system = BGESystem(theme_name)
 
-        # Directly instantiate your enhanced BGE System
-        self.gui_system = BGESystem(theme_path)  # This instance now manages everything
-
-        # Solid button
-        self.btn_solid = self.gui_system.add_element(  # Call add_element on your gui_system
+        self.btn_solid = self.gui_system.add_element(
             bgui.FrameButton,
             "btn_solid",
             text="Solid Button",
@@ -24,8 +24,7 @@ class MainMenu(types.KX_PythonComponent):
         )
         self.btn_solid.on_click = self.on_button_click 
 
-        # Gradient button
-        self.btn_gradient = self.gui_system.add_element(  # Call add_element on your gui_system
+        self.btn_gradient = self.gui_system.add_element(
             bgui.FrameButton,
             "btn_gradient", 
             text="Gradient Button",
@@ -35,8 +34,7 @@ class MainMenu(types.KX_PythonComponent):
         )
         self.btn_gradient.on_click = self.on_button_click
 
-        # Example of button with custom color
-        self.btn_custom = self.gui_system.add_element(  # Call add_element on your gui_system
+        self.btn_custom = self.gui_system.add_element(
             bgui.FrameButton,
             "btn_custom",
             text="Custom Color",
@@ -55,17 +53,14 @@ class MainMenu(types.KX_PythonComponent):
 
     def on_button_click(self, button):
         clicked_button_name = button.name
-        new_color = (0.2, 0.6, 0.8, 1.0) 
+        new_color = (0.2, 0.6, 0.8, 1.0)
 
         for btn_name, original_color in self.original_colors.items():
-            current_button = self.gui_system.get_element(btn_name)  # Call get_element on your gui_system
-
+            current_button = self.gui_system.get_element(btn_name)
             if btn_name == clicked_button_name:
                 current_button.set_base_color(new_color)
             else:
                 current_button.set_base_color(original_color)
 
     def update(self):
-        # Essential: Call the 'run' method of your BGE System every frame.
-        # This processes input and updates the state of the widgets.
         self.gui_system.run()

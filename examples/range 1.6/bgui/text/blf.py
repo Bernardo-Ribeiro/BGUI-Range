@@ -1,9 +1,8 @@
-from .textlibrary import TextLibrary
+import os
 import blf
+from .textlibrary import TextLibrary
 
 class BlfTextLibrary(TextLibrary):
-    """Text library wrapper around blf"""
-
     def draw(self, fontid, text):
         blf.draw(fontid, text)
 
@@ -17,4 +16,11 @@ class BlfTextLibrary(TextLibrary):
         return blf.dimensions(fontid, text)
 
     def load(self, filename):
-        return blf.load(filename)
+        base_path = os.path.dirname(__file__)
+        full_path = os.path.join(base_path, '..', 'fonts', filename)
+        full_path = os.path.normpath(full_path)
+
+        if not os.path.exists(full_path):
+            raise FileNotFoundError(f"Font not found: {full_path}")
+
+        return blf.load(full_path)
