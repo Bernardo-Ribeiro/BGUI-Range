@@ -249,6 +249,7 @@ class Widget:
 
 	def _update_position(self, size=None, pos=None):
 		if size is not None:
+			#print(f"Widget._update_position: Updating size for '{self.name}'. New base_size: {size}")
 			size = list(size)
 			self._base_size = size[:]
 		else:
@@ -256,6 +257,7 @@ class Widget:
 		if pos is not None:
 			pos = list(pos)
 			self._base_pos = pos[:]
+			#print(f"Widget._update_position: Updating pos for '{self.name}'. New base_pos: {pos}")
 		else:
 			pos = self._base_pos[:]
 
@@ -282,6 +284,7 @@ class Widget:
 		width = size[0]
 		height = size[1]
 		self._size = [width, height]
+		#print(f"Widget._update_position: Calculated pixel size for '{self.name}': {self._size}")
 		# The "private" position returned by setter
 		self._position = [x, y]
 
@@ -292,6 +295,7 @@ class Widget:
 					[x + width, y + height],
 					[x, y + height]
 				]
+		#print(f"Widget._update_position: Calculated gl_position for '{self.name}': {self.gl_position}")
 
 		# Update any children
 		for widget in self.children.values():
@@ -416,6 +420,7 @@ class Widget:
 
 	def _handle_mouse(self, pos, event):
 		"""Run any event callbacks"""
+		#print(f"Widget._handle_mouse called on '{self.name}'. Pos: {pos}, Event: {event}")
 		# Don't run if we're not visible or frozen
 		if not self.visible or self.frozen:
 			return

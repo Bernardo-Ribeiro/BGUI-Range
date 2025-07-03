@@ -24,6 +24,27 @@ except Exception as e:
     print(f"CRITICAL ERROR during initial Range Engine module imports: {e}")
     module_level_logic, module_level_events, module_level_render, range_engine_types_module = None, None, None, None
 
+def get_screen_info():
+    """
+    Retorna informações sobre a tela atual.
+    :return: Uma tupla contendo (largura, altura) da janela em pixels
+    """
+    try:
+        from Range import render
+        return (render.getWindowWidth(), render.getWindowHeight())
+    except Exception as e:
+        print(f"Erro ao obter informações da tela: {e}")
+        return (800, 600)
+
+def flatten_status_list(lst):
+    """Achata listas aninhadas de qualquer profundidade em uma lista plana."""
+    result = []
+    for item in lst:
+        if isinstance(item, list):
+            result.extend(flatten_status_list(item))
+        else:
+            result.append(item)
+    return result
 
 class Layout(Widget):
     """The base layout class to be used with the BGESystem"""
@@ -153,17 +174,40 @@ class System(BGUISystem):
         mouse_events = mouse_obj.inputs
         pos = list(mouse_obj.position[:])
 
+        raw_mouse_event_status_for_debug = "N/A"
+        left_mouse_key = getattr(self.events, 'LEFTMOUSE', None)
+        final_mouse_status_int = self.logic.KX_INPUT_NONE # Initialize with default integer state
+
+        if left_mouse_key is not None and left_mouse_key in mouse_events:
+            raw_status_from_engine = mouse_events[left_mouse_key].status
+            raw_mouse_event_status_for_debug = raw_status_from_engine # For debug print
+
+            # Força o achatamento de listas aninhadas
+            status_list = flatten_status_list(raw_status_from_engine)
+
+            if any(s == self.logic.KX_INPUT_JUST_ACTIVATED for s in status_list):
+                final_mouse_status_int = self.logic.KX_INPUT_JUST_ACTIVATED
+            elif any(s == self.logic.KX_INPUT_JUST_RELEASED for s in status_list):
+                final_mouse_status_int = self.logic.KX_INPUT_JUST_RELEASED
+            elif any(s == self.logic.KX_INPUT_ACTIVE for s in status_list):
+                final_mouse_status_int = self.logic.KX_INPUT_ACTIVE
+            else:
+                final_mouse_status_int = self.logic.KX_INPUT_NONE
+        # else: left_mouse_key not found, final_mouse_status_int remains KX_INPUT_NONE
+
         pos[0] *= self.render.getWindowWidth()
         pos[1] = self.render.getWindowHeight() - (self.render.getWindowHeight() * pos[1])
 
-        if mouse_events[self.events.LEFTMOUSE] == self.logic.KX_INPUT_JUST_ACTIVATED:
+
+        if final_mouse_status_int == self.logic.KX_INPUT_JUST_ACTIVATED:
             mouse_state = BGUI_MOUSE_CLICK
-        elif mouse_events[self.events.LEFTMOUSE] == self.logic.KX_INPUT_JUST_RELEASED:
+        elif final_mouse_status_int == self.logic.KX_INPUT_JUST_RELEASED:
             mouse_state = BGUI_MOUSE_RELEASE
-        elif mouse_events[self.events.LEFTMOUSE] == self.logic.KX_INPUT_ACTIVE:
+        elif final_mouse_status_int == self.logic.KX_INPUT_ACTIVE:
             mouse_state = BGUI_MOUSE_ACTIVE
         else:
             mouse_state = BGUI_MOUSE_NONE
+        
         self.update_mouse(pos, mouse_state)
 
         keyboard = self.logic.keyboard
@@ -173,15 +217,24 @@ class System(BGUISystem):
         left_shift_key_event = getattr(self.events, 'LEFTSHIFTKEY', None)
         right_shift_key_event = getattr(self.events, 'RIGHTSHIFTKEY', None)
 
-        is_shifted = (left_shift_key_event is not None and key_events[left_shift_key_event] == self.logic.KX_INPUT_ACTIVE) or \
-                     (right_shift_key_event is not None and key_events[right_shift_key_event] == self.logic.KX_INPUT_ACTIVE)
+        is_shifted = False
+        if left_shift_key_event is not None and left_shift_key_event in key_events:
+            shift_status = key_events[left_shift_key_event].status
+            if isinstance(shift_status, list) and shift_status: shift_status = shift_status[-1]
+            if shift_status == self.logic.KX_INPUT_ACTIVE: is_shifted = True
+        
+        if not is_shifted and right_shift_key_event is not None and right_shift_key_event in key_events:
+            shift_status = key_events[right_shift_key_event].status
+            if isinstance(shift_status, list) and shift_status: shift_status = shift_status[-1]
+            if shift_status == self.logic.KX_INPUT_ACTIVE: is_shifted = True
+
 
         for key, state in keyboard.inputs.items():
             if state == self.logic.KX_INPUT_JUST_ACTIVATED:
                 if key in self.keymap:
                     self.update_keyboard(self.keymap[key], is_shifted)
 
-    # --- Element Management Methods (ensure these are present) ---
+    # --- Element Management Methods ---
     def add_element(self, element_class, name, **kwargs):
         parent = kwargs.pop('parent', self.main_frame)
         widget = element_class(parent, name, **kwargs)
