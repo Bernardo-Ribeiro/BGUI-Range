@@ -1,0 +1,16 @@
+<UI>
+    <Label name="titulo" text="Bem-vindo!" pos="0.4,0.9" pt_size="72" />
+    <Slider name="volume" pos="0.33,0.4" size="0.5,0.05" min_value="0" max_value="100" value="50" />
+    <!-- Health Bar -->
+    <ProgressBar name="health_bar" size="0.2,0.03" pos="0.02,0.02" percent="1.0" />
+    <!-- Stamina Bar -->
+    <ProgressBar name="stamina_bar" size="0.2,0.03" pos="0.02,0.06" percent="1.0" />
+    <!-- Minimap Placeholder (Frame + Label) -->
+    <Button name="minimap_frame" size="0.15,0.20" pos="0.83,0.78" text="" />
+    <Label name="minimap_label" text="Minimap" pos="0.85,0.88" pt_size="18" />
+    <!-- Crosshair Placeholder (Label) -->
+    <Label name="crosshair" text="+" pos="0.5,0.5" pt_size="32" />
+    <!-- Ammo Counter -->
+    <Label name="ammo_label" text="30 / 120" pos="0.98,0.02" pt_size="24" />
+    <Button name="botao1" text="Jogar" pos="0.5,0.6" size="0.3,0.1" base_color="0.2,0.6,0.8,1" />
+</UI> 
