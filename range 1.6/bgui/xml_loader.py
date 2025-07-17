@@ -22,7 +22,7 @@ def load_ui_from_xml(xml_path, parent, theme=None):
         widget = create_widget_from_elem(elem, parent)
         if widget:
             widgets.append(widget)
-    return widgets
+    return {w.name: w for w in widgets if hasattr(w, "name")}
 
 def create_widget_from_elem(elem, parent):
     widget_type = elem.tag

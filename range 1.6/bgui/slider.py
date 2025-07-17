@@ -120,9 +120,7 @@ class Slider(Widget):
     def set_on_value_change(self, callback):
         self._on_value_change = callback
         
-    def _draw(self):
-        """Draws the slider"""
-        #print(f"Slider._draw: _value={self._value}, _min_value={self._min_value}, _max_value={self._max_value}")
+    def _draw(self):        
         # Enable alpha blending
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -137,17 +135,15 @@ class Slider(Widget):
              percent = 0.0
         else:
             percent = (self._value - self._min_value) / value_range
-        #print(f"  calculated percent: {percent}")
 
         mid_x = self.gl_position[0][0] + (self.gl_position[1][0] - self.gl_position[0][0]) * percent
-        #print(f"  calculated mid_x: {mid_x}")
 
         # Set fill colors based on slider state
         current_fill_colors = list(self.fill_colors) # Start with default colors (make a copy)
 
         if self._dragging:
             current_fill_colors = [self.active_color] * 4
-        elif self._mouse_over: # Only apply hover if not dragging
+        elif self._hover: # Use the hover from the Widget base
             current_fill_colors = [self.hover_color] * 4
         
         # Draw fill
@@ -197,33 +193,12 @@ class Slider(Widget):
         
         Widget._draw(self)
         
-    def _handle_mouse(self, pos, event):
-        """Handles all mouse events."""
-        is_inside = self._is_inside(pos)
-        self._mouse_over = is_inside # Set hover based on current position
-
-        # Start dragging
-        if event == BGUI_MOUSE_CLICK and is_inside:
+    def _handle_active(self):
+        if not self._dragging:
             self._dragging = True
-            self._update_value_from_mouse(pos)
-            return True
+        self._update_value_from_mouse(self.cursor_pos)
+        self._dragging = False
 
-        # Stop dragging
-        if event == BGUI_MOUSE_RELEASE:
-            if self._dragging:
-                self._dragging = False
-                return True
-
-        # Update value while dragging
-        if self._dragging and event == BGUI_MOUSE_ACTIVE:
-            self._update_value_from_mouse(pos)
-            return True
-
-        # If no click/drag event was handled, the event is a movement.
-        # The update of self._mouse_over at the start of the function already handles hover.
-        # Return False to not consume the event, allowing other widgets to receive it.
-        return False
-        
     def _update_value_from_mouse(self, mouse_pos):
         # The slider's position on the X axis
         slider_x_start = self.gl_position[0][0]
@@ -245,11 +220,8 @@ class Slider(Widget):
         self.value = new_value
 
     def _is_inside(self, pos):
-        #print(f"Slider._is_inside called with pos: {pos}")
-        #print(f"  self.gl_position for bounds check: {self.gl_position}")
         is_inside = (self.gl_position[0][0] <= pos[0] <= self.gl_position[1][0] and
                      self.gl_position[0][1] <= pos[1] <= self.gl_position[2][1])
-        #print(f"  _is_inside result: {is_inside}")
         return is_inside
 
     def _update_anims(self):

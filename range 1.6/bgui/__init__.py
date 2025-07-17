@@ -1,4 +1,4 @@
-from .system import *
+#from .system import *
 #from .bge_utils import System as BGESystem
 from .widget import *
 from .frame import *

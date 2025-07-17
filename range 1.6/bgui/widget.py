@@ -166,8 +166,10 @@ class Widget:
 		self.name = name
 		self.options = options
 
-		# Store the system so children can access theming data
-		self._system = parent._system
+		if parent is not None:
+			self._system = parent._system
+		else:
+			self._system = weakref.ref(self)
 
 		if sub_theme:
 			self.theme_section += ':' + sub_theme
@@ -191,8 +193,12 @@ class Widget:
 		self._on_mouse_exit = None
 
 		# Setup the parent
-		parent._attach_widget(self)
-		self._parent = weakref.proxy(parent)
+		if parent is not None and parent is not self:
+			parent._attach_widget(self)
+		if parent is not None:
+			self._parent = weakref.proxy(parent)
+		else:
+			self._parent = None
 
 		# A dictionary to store children widgets
 		self._children = OrderedDict()
@@ -213,6 +219,8 @@ class Widget:
 
 		# A list of running animations
 		self.anims = []
+
+		self.cursor_pos = [0, 0]
 
 	def __del__(self):
 		# Debug print
@@ -274,10 +282,10 @@ class Widget:
 		if self.options & BGUI_CENTERY:
 			pos[1] = self.parent.size[1] / 2 - size[1] / 2
 
-		if self.parent != self:
+		if self.parent is not None:
 			x = pos[0] + self.parent.position[0]
 			y = pos[1] + self.parent.position[1]
-		else:  # A widget should only be its own parent if it's the system...
+		else:  # Widget raiz (System)
 			x = pos[0]
 			y = pos[1]
 
@@ -419,6 +427,8 @@ class Widget:
 			widget._update_anims()
 
 	def _handle_mouse(self, pos, event):
+		self.cursor_pos = pos
+		#print(f"Widget {self.name} recebeu evento de mouse: {event}")
 		"""Run any event callbacks"""
 		#print(f"Widget._handle_mouse called on '{self.name}'. Pos: {pos}, Event: {event}")
 		# Don't run if we're not visible or frozen
@@ -453,12 +463,15 @@ class Widget:
 		self._hover = True
 
 		# Run any children callback methods
-		for widget in self.children.values():
-			if (widget.gl_position[0][0] <= pos[0] <= widget.gl_position[1][0]) and \
-				(widget.gl_position[0][1] <= pos[1] <= widget.gl_position[2][1]):
-					widget._handle_mouse(pos, event)
+		for child in self.children.values():
+			if event == BGUI_MOUSE_RELEASE:
+				
+				child._handle_mouse(pos, event)
+			elif (child.gl_position[0][0] <= pos[0] <= child.gl_position[1][0]) and \
+				(child.gl_position[0][1] <= pos[1] <= child.gl_position[2][1]):
+					child._handle_mouse(pos, event)
 			else:
-				widget._update_hover(False)
+				child._update_hover(False)
 
 	def _update_hover(self, hover=False):
 		if not hover and self._hover:
@@ -467,14 +480,14 @@ class Widget:
 				self.on_mouse_exit(self)
 		self._hover = hover
 
-		for widget in self.children.values():
-			widget._update_hover(hover)
+		for child in self.children.values():
+			child._update_hover(hover)
 
 	def _handle_key(self, key, is_shifted):
 		"""Handle any keyboard input"""
-		for widget in self.children.values():
+		for child in self.children.values():
 			if self._hover:
-				widget._handle_key(key, is_shifted)
+				child._handle_key(key, is_shifted)
 
 	# These exist so they can be overridden by subclasses
 	def _handle_click(self):
@@ -509,7 +522,8 @@ class Widget:
 	def _remove_widget(self, widget):
 		"""Removes the widget from this widget's children"""
 
-		del self.children[widget.name]
+		if widget and widget.parent:
+			widget.parent.remove_widget(widget)
 
 	def _draw(self):
 		"""Draws the widget and the widget's children"""
