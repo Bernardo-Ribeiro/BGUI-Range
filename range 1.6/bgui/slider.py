@@ -64,7 +64,7 @@ class Slider(Widget):
         # If value is not a string, list, or tuple, or other cases
         return (1.0, 0.0, 1.0, 1.0) # Magenta error color
 
-    def __init__(self, parent, name="", value=0.0, min_value=0.0, max_value=1.0, size=[100, 20], pos=[0, 0], sub_theme='', options=BGUI_DEFAULT):
+    def __init__(self, parent, name="", value=0.0, min_value=0.0, max_value=1.0, size=[100, 20], pos=[0, 0], sub_theme='', options=BGUI_DEFAULT, fill_color=None):
         # Initialize Slider-specific attributes
         self._min_value = min_value
         self._max_value = max_value
@@ -105,6 +105,9 @@ class Slider(Widget):
 
         # Set the initial value using the property to ensure clamping and trigger callbacks if any
         self.value = value
+        
+        if fill_color:
+            self.fill_colors = [tuple(fill_color)] * 4
         
     @property
     def value(self):

@@ -19,7 +19,7 @@ class MainMenu(types.KX_PythonComponent):
         self.slider = self.widgets.get("volume")
         
         def on_slider_change(value):
-            scale = max(0.1, value / 50.0)  # Evita escala zero
+            scale = max(0.1, value / 50.0)
             self.cube.localScale = [scale, scale, scale]
             print("Escala do cubo:", self.cube.localScale)
         

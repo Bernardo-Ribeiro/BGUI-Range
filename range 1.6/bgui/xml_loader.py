@@ -41,7 +41,7 @@ def create_widget_from_elem(elem, parent):
 
 def try_parse_widget_arg(key, value):
     # Convert comma-separated strings to lists of floats for certain attributes
-    if key in ("pos", "size", "base_color"):
+    if key in ("pos", "size", "base_color", "color", "outline_color", "fill_color", "fill_colors"):
         return [float(x) for x in value.split(",")]
     # Try to convert to int or float, otherwise keep as string
     for fn in (int, float):
