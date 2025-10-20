@@ -12,10 +12,11 @@ class Label(Widget):
 				'OutlineSize': 0,
 				'OutlineSmoothing': False,
 				'Size': 20,
+				'CenterText': True,
 				}
 
 	def __init__(self, parent, name=None, text="", font=None, pt_size=None, color=None,
-				outline_color=None, outline_size=None, outline_smoothing=None, pos=[0, 0], sub_theme='', options=BGUI_DEFAULT):
+				outline_color=None, outline_size=None, outline_smoothing=None, pos=[0, 0], sub_theme='', options=BGUI_DEFAULT, center_text=None):
 		"""
 		:param parent: the widget's parent
 		:param name: the name of the widget
@@ -23,11 +24,17 @@ class Label(Widget):
 		:param font: the font to use
 		:param pt_size: the point size of the text to draw (defaults to 30 if None)
 		:param color: the color to use when rendering the font
-		:param pos: a tuple containing the x and y position
+		:param pos: a tuple containing the x and y position (normalized 0-1 if BGUI_NORMALIZE is set, pixels otherwise)
 		:param sub_theme: name of a sub_theme defined in the theme file (similar to CSS classes)
 		:param options: various other options
+		:param center_text: whether to center the text at the given position (defaults to theme setting)
 
 		"""
+		is_normalized = all(0 <= p <= 1 for p in pos)
+		if not is_normalized:
+			options &= ~BGUI_DEFAULT
+			options |= BGUI_NO_NORMALIZE
+
 		Widget.__init__(self, parent, name, None, [0, 0], pos, sub_theme, options)
 
 		if font:
@@ -61,6 +68,11 @@ class Label(Widget):
 			self.outline_smoothing = outline_smoothing
 		else:
 			self.outline_smoothing = self.theme['OutlineSmoothing']
+			
+		if center_text is not None:
+			self.center_text = center_text
+		else:
+			self.center_text = self.theme['CenterText']
 
 		self.text = text
 
@@ -71,14 +83,24 @@ class Label(Widget):
 
 	@text.setter
 	def text(self, value):
+		
 		self.system.textlib.size(self.fontid, self.pt_size, 72)
-		size = [self.system.textlib.dimensions(self.fontid, value)[0], self.system.textlib.dimensions(self.fontid, 'Mj')[0]]
-
+		
+		width = self.system.textlib.dimensions(self.fontid, value)[0]
+		height = self.system.textlib.dimensions(self.fontid, 'Mj')[0]
+		
+		self._original_size = [width, height]
+		
 		if not (self.options & BGUI_NO_NORMALIZE):
-			size[0] /= self.parent.size[0]
-			size[1] /= self.parent.size[1]
+			size = [width / self.parent.size[0], height / self.parent.size[1]]
+		else:
+			size = [width, height]
 
-		self._update_position(size, self._base_pos)
+		base_pos = list(self._base_pos)
+		if not (self.options & BGUI_NO_NORMALIZE) and (base_pos[0] > 1 or base_pos[1] > 1):
+			base_pos = [base_pos[0] / self.parent.size[0], base_pos[1] / self.parent.size[1]]
+
+		self._update_position(size, base_pos)
 
 		self._text = value
 
@@ -89,15 +111,34 @@ class Label(Widget):
 
 	@pt_size.setter
 	def pt_size(self, value):
-		# Normalize the pt size (1000px height = 1)
 		if self.system.normalize_text:
 			self._pt_size = int(value * (self.system.size[1] / 1000))
 		else:
 			self._pt_size = value
 
 	def _draw_text(self, x, y):
-		for i, txt in enumerate([i for i in self._text.split('\n')]):
-			self.system.textlib.position(self.fontid, x, y - (self.size[1] * i), 0)
+		lines = [i for i in self._text.split('\n')]
+		for i, txt in enumerate(lines):
+			
+			if self.center_text:
+				if not (self.options & BGUI_NO_NORMALIZE):
+					if x > 1:
+						x = x / self.parent.size[0]
+					
+					half_width_norm = (self._original_size[0] / 2) / self.parent.size[0]
+					
+					x_centered_norm = x - half_width_norm
+					
+					adjusted_x = x_centered_norm * self.parent.size[0]
+				else:
+					half_width = self._original_size[0] / 2
+					adjusted_x = x - half_width
+			else:
+				adjusted_x = x
+			
+			final_y = y - (self.size[1] * i)
+			
+			self.system.textlib.position(self.fontid, adjusted_x, final_y, 0)
 			self.system.textlib.draw(self.fontid, txt.replace('\t', '    '))
 
 	def _draw(self):

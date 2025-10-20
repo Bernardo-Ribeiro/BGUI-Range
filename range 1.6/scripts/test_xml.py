@@ -21,7 +21,6 @@ class MainMenu(types.KX_PythonComponent):
         def on_slider_change(value):
             scale = max(0.1, value / 50.0)
             self.cube.localScale = [scale, scale, scale]
-            print("Escala do cubo:", self.cube.localScale)
         
         self.slider.set_on_value_change(on_slider_change)
 

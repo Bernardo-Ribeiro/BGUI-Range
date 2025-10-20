@@ -4,7 +4,13 @@ from .widget import Widget
 from .slider import Slider
 from .frame_button import FrameButton
 from .progress_bar import ProgressBar
-# Add other widget imports as needed
+from .frame import Frame
+from .image import Image
+from .image_button import ImageButton
+from .list_box import ListBox
+from .text_block import TextBlock
+from .text_input import TextInput
+from .video import Video
 
 # Mapping XML tag names to BGUI widget classes
 WIDGET_MAP = {
@@ -12,6 +18,13 @@ WIDGET_MAP = {
     'Slider': Slider,
     'Button': FrameButton,
     'ProgressBar': ProgressBar,
+    'Frame': Frame,
+    'Image': Image,
+    'ImageButton': ImageButton,
+    'ListBox': ListBox,
+    'TextBlock': TextBlock,
+    'TextInput': TextInput,
+    'Video': Video,
 }
 
 def load_ui_from_xml(xml_path, parent, theme=None):
@@ -41,7 +54,8 @@ def create_widget_from_elem(elem, parent):
 
 def try_parse_widget_arg(key, value):
     # Convert comma-separated strings to lists of floats for certain attributes
-    if key in ("pos", "size", "base_color", "color", "outline_color", "fill_color", "fill_colors"):
+    if key in ("pos", "size", "base_color", "color", "outline_color", "fill_color", "fill_colors", 
+               "border_color", "text_color", "highlight_color", "selection_color"):
         return [float(x) for x in value.split(",")]
     # Try to convert to int or float, otherwise keep as string
     for fn in (int, float):
