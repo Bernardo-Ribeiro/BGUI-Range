@@ -106,6 +106,9 @@ class System(Widget):
         # --- Fim do workaround ---
 
         # Caminho do tema
+        if theme_name is None:
+            theme_name = "default"
+        
         theme_path = self.logic.expandPath(f"//bgui/themes/{theme_name}")
         if not os.path.exists(theme_path):
             print(f"BGUI WARNING: Theme '{theme_name}' not found. Using default theme at '//bgui/themes/default'.")

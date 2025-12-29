@@ -4,7 +4,6 @@ from bgui.bge_utils import System as BGESystem
 from collections import OrderedDict
 
 
-
 class MainMenu(types.KX_PythonComponent):
     args = OrderedDict({
     })
