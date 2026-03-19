@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visual XML UI Editor (BGUI)</title>
+  <link rel="stylesheet" href="./xml_ui_editor.css" />
+</head>
+<body>
+  <div class="sb-topbar">
+    <div class="sb-brand">BGUI XML UI Builder</div>
+  </div>
+  <div class="app">
+    <section class="panel panel-left">
+      <div class="panel-header">
+        <h2>Hierarchy</h2>
+      </div>
+      <div class="panel-body">
+        <div class="actions">
+          <button class="btn-secondary" id="loadXmlBtn">Load XML</button>
+          <input id="xmlFileInput" type="file" accept=".xml,text/xml" style="display:none;" />
+          <button class="btn-danger" id="clearWidgetsBtn">Clear all</button>
+        </div>
+
+        <div class="small-title">Widgets</div>
+        <div id="widgetList" class="widget-list"></div>
+      </div>
+    </section>
+
+    <section class="panel panel-center">
+      <div class="panel-header">
+        <h2>Viewport</h2>
+      </div>
+      <div class="panel-body">
+        <div class="preview-wrap">
+          <div id="previewStage" class="preview-stage"></div>
+        </div>
+        <div class="theme-bar">
+          <button class="btn-secondary" id="loadDefaultThemeBtn">Load default theme.cfg</button>
+          <input class="theme-file" id="themeFileInput" type="file" accept=".cfg,.ini,.txt" />
+          <input class="theme-font-base" id="themeFontBaseInput" value="../range 1.6/bgui/fonts" placeholder="Font base URL (fonts folder)" />
+          <span id="themeInfo" class="theme-info">Theme: internal fallback</span>
+        </div>
+        <div class="preview-hint">16:9 preview. Origin used in preview: bottom-left corner. Pos and size values are normalized between 0 and 1.</div>
+      </div>
+    </section>
+
+    <section class="panel panel-right">
+      <div class="panel-header">
+        <h2>Inspector</h2>
+      </div>
+      <div class="panel-body">
+        <div class="grid">
+          <div class="field">
+            <label for="widgetType">Type</label>
+            <select id="widgetType">
+              <option>Label</option>
+              <option>Slider</option>
+              <option>Button</option>
+              <option>ProgressBar</option>
+              <option>Frame</option>
+              <option>Image</option>
+              <option>ImageButton</option>
+              <option>ListBox</option>
+              <option>TextBlock</option>
+              <option>TextInput</option>
+              <option>Video</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="widgetName">Name</label>
+            <input id="widgetName" placeholder="ex: health_bar" />
+          </div>
+
+          <div class="field">
+            <label for="widgetParent">Parent</label>
+            <select id="widgetParent">
+              <option value="">(UI root)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="widgetText">text</label>
+            <input id="widgetText" placeholder="ex: Welcome!" />
+          </div>
+
+          <div class="field">
+            <label for="widgetPos">pos</label>
+            <input id="widgetPos" placeholder="ex: 0.5,0.8" />
+          </div>
+          <div class="field">
+            <label for="widgetSize">size</label>
+            <input id="widgetSize" placeholder="ex: 0.2,0.03" />
+          </div>
+
+          <div class="field">
+            <label for="widgetPt">pt_size</label>
+            <input id="widgetPt" placeholder="ex: 18" />
+          </div>
+          <div class="field">
+            <label for="widgetColor">color</label>
+            <input id="widgetColor" placeholder="ex: 1,0,0,1" />
+          </div>
+
+          <div class="field">
+            <label for="widgetMin">min_value</label>
+            <input id="widgetMin" placeholder="ex: 0" />
+          </div>
+          <div class="field">
+            <label for="widgetMax">max_value</label>
+            <input id="widgetMax" placeholder="ex: 100" />
+          </div>
+
+          <div class="field">
+            <label for="widgetValue">value</label>
+            <input id="widgetValue" placeholder="ex: 50" />
+          </div>
+          <div class="field">
+            <label for="widgetPercent">percent</label>
+            <input id="widgetPercent" placeholder="ex: 1.0" />
+          </div>
+
+          <div class="field full">
+            <label for="widgetSubTheme">sub_theme</label>
+            <input id="widgetSubTheme" placeholder="ex: Slider" />
+          </div>
+
+          <div class="field full">
+            <label for="widgetExtra">Extra attributes (key=value;key2=value2)</label>
+            <input id="widgetExtra" placeholder="ex: options=0;angle=15" />
+            <div class="hint">Use ; to separate pairs. Name and fields filled above are included automatically.</div>
+          </div>
+        </div>
+
+        <div class="inspector-actions">
+          <button class="btn-primary" id="addWidgetBtn">Add widget</button>
+          <button class="btn-secondary" id="cancelEditBtn" style="display:none;">Cancel edit</button>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div class="small-title">XML</div>
+        <div class="actions" style="margin-top: 0; margin-bottom: 10px;">
+          <button class="btn-primary" id="saveXmlBtn">Save XML</button>
+          <button class="btn-primary" id="generateXmlBtn">Generate XML</button>
+          <button class="btn-ok" id="copyXmlBtn">Copy XML</button>
+          <button class="btn-secondary" id="downloadXmlBtn">Download interface.xml</button>
+        </div>
+        <textarea id="xmlOutput" class="xml-output" spellcheck="false"></textarea>
+      </div>
+    </section>
+  </div>
+
+  <script src="./xml_ui_editor.constants.js" defer></script>
+  <script src="./xml_ui_editor.js" defer></script>
+</body>
+</html>

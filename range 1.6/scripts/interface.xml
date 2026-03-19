@@ -1,14 +1,10 @@
 <UI>
-    <Label name="titulo" text="Bem-vindo!" pos="0.5,0.8" pt_size="72" />
-    <Slider name="volume" pos="0.25,0.175" size="0.5,0.05" min_value="0" max_value="100" value="50" sub_theme="Slider" />
-    <!-- Health Bar -->
-    <ProgressBar name="health_bar" size="0.2,0.03" pos="0.02,0.02" percent="1.0" sub_theme="Health" />
-    <!-- Stamina Bar -->
-    <ProgressBar name="stamina_bar" size="0.2,0.03" pos="0.02,0.06" percent="1.0" sub_theme="Stamina" />
-    <!-- Minimap Placeholder (Frame + Label) -->
-    <Frame name="minimap_frame" size="0.15,0.20" pos="0.83,0.78">
-        <Label name="minimap_label" text="Minimap" pos="0.5,0.5" pt_size="18" />
-    </Frame>
-    <!-- Ammo Counter -->
-    <Label name="ammo_label" text="30 / 120" pos="0.8,0.2" pt_size="72" color="1,0,0,1"/>
-</UI> 
+  <Label name="titulo" text="Bem-vindo!" pos="0.5,0.8" pt_size="72" />
+  <Slider name="volume" pos="0.25,0.175" size="0.5,0.05" min_value="0" max_value="100" value="50" sub_theme="Slider" />
+  <ProgressBar name="health_bar" size="0.2,0.03" pos="0.02,0.02" percent="1.0" sub_theme="Health" />
+  <ProgressBar name="stamina_bar" size="0.2,0.03" pos="0.02,0.06" percent="1.0" sub_theme="Stamina" />
+  <Frame name="minimap_frame" size="0.15,0.20" pos="0.83,0.78">
+    <Label name="minimap_label" text="Minimap" pos="0.5,0.5" pt_size="18" />
+  </Frame>
+  <Label name="ammo_label" text="30 / 120" pos="0.8,0.2" pt_size="72" color="1,0,0,1" />
+</UI>
